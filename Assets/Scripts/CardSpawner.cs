@@ -43,28 +43,13 @@ public class CardSpawner : MonoBehaviour
             return;
         }
 
-        RectTransform rt = cardContainer.GetComponent<RectTransform>();
-        float width = rt.rect.width;
-        float height = rt.rect.height;
-
-        float totalSpacingX = spacing.x * (columns - 1);
-        float totalSpacingY = spacing.y * (rows - 1);
-
-        float cellWidth = (width - totalSpacingX) / columns;
-        float cellHeight = (height - totalSpacingY) / rows;
-
-        // Optional: Clamp cell size to avoid too large or too small cards
-        float maxCellSize = 200f;
-        cellWidth = Mathf.Min(cellWidth, maxCellSize);
-        cellHeight = Mathf.Min(cellHeight, maxCellSize);
-
-        grid.cellSize = new Vector2(cellWidth, cellHeight);
+        // ✅ Fixed size: 130 x 130
+        grid.cellSize = new Vector2(130f, 130f);
         grid.spacing = spacing;
         grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
         grid.constraintCount = columns;
 
-        // Debug info
-        Debug.Log($"Grid cell size set to: {cellWidth} x {cellHeight}");
+        Debug.Log("Grid cell size set to fixed 130x130.");
     }
 
     void GenerateCards()
