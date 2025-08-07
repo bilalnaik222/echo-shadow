@@ -12,6 +12,7 @@ public class Card : MonoBehaviour
     private bool isMatched = false;
     private bool isAnimating = false;
 
+    // Assign card color & ID, reset states
     public void SetCard(Color frontColor, int id)
     {
         cardID = id;
@@ -22,6 +23,7 @@ public class Card : MonoBehaviour
         isMatched = false;
     }
 
+    // Called by Button onClick
     public void OnClick()
     {
         if (isFlipped || isMatched || CardManager.Instance.IsBusy || isAnimating)
@@ -32,11 +34,12 @@ public class Card : MonoBehaviour
         AudioManager.Instance.PlayFlip();
     }
 
+    // Coroutine for flip animation (Y axis rotation)
     private IEnumerator FlipAnimation()
     {
         isAnimating = true;
 
-        // Rotate Y from 0 to 90
+        // Rotate Y from 0 to 90 degrees
         float time = 0f;
         while (time < 0.25f)
         {
@@ -46,12 +49,12 @@ public class Card : MonoBehaviour
             yield return null;
         }
 
-        // Switch front/back visibility mid-flip
+        // Toggle front/back visibility mid-flip
         isFlipped = !isFlipped;
         frontImage.gameObject.SetActive(isFlipped);
         backImage.gameObject.SetActive(!isFlipped);
 
-        // Rotate Y from 90 to 0
+        // Rotate Y from 90 to 0 degrees
         time = 0f;
         while (time < 0.25f)
         {
@@ -62,10 +65,10 @@ public class Card : MonoBehaviour
         }
 
         transform.localRotation = Quaternion.identity;
-
         isAnimating = false;
     }
 
+    // Called by CardManager if mismatch to flip back
     public void FlipBack()
     {
         if (isAnimating) return;
@@ -77,7 +80,7 @@ public class Card : MonoBehaviour
     {
         isAnimating = true;
 
-        // Rotate Y from 0 to 90
+        // Rotate Y from 0 to 90 degrees
         float time = 0f;
         while (time < 0.25f)
         {
@@ -87,11 +90,12 @@ public class Card : MonoBehaviour
             yield return null;
         }
 
+        // Set back side visible, front hidden
         isFlipped = false;
         frontImage.gameObject.SetActive(false);
         backImage.gameObject.SetActive(true);
 
-        // Rotate Y from 90 to 0
+        // Rotate Y from 90 to 0 degrees
         time = 0f;
         while (time < 0.25f)
         {
@@ -102,16 +106,17 @@ public class Card : MonoBehaviour
         }
 
         transform.localRotation = Quaternion.identity;
-
         isAnimating = false;
     }
 
+    // Mark card as matched, disable interaction optionally
     public void SetMatched()
     {
         isMatched = true;
-        // Optionally disable button or add effect here
+        // Optional: disable Button or add visual effect
     }
 
+    // Public getters
     public int ID => cardID;
     public bool IsMatched => isMatched;
 }
