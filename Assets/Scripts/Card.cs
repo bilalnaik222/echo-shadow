@@ -13,15 +13,27 @@ public class Card : MonoBehaviour
     private bool isAnimating = false;
 
     // Assign card color & ID, reset states
-    public void SetCard(Color frontColor, int id)
+    // public void SetCard(Color frontColor, int id)
+    // {
+    //     cardID = id;
+    //     frontImage.color = frontColor;
+    //     frontImage.gameObject.SetActive(false);
+    //     backImage.gameObject.SetActive(true);
+    //     isFlipped = false;
+    //     isMatched = false;
+    // }
+
+// assign card sprite & ID, reset states
+    public void SetCard(Sprite frontSprite, int id)
     {
         cardID = id;
-        frontImage.color = frontColor;
+        frontImage.sprite = frontSprite;
         frontImage.gameObject.SetActive(false);
         backImage.gameObject.SetActive(true);
         isFlipped = false;
         isMatched = false;
     }
+
 
     // Called by Button onClick
     public void OnClick()

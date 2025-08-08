@@ -14,19 +14,8 @@ public class CardSpawner : MonoBehaviour
     [Header("Grid Spacing")]
     public Vector2 spacing = new Vector2(10f, 10f);
 
-    [Header("Colors for Front Sides")]
-    public List<Color> cardColors = new List<Color>
-    {
-        Color.red,
-        Color.blue,
-        Color.green,
-        Color.yellow,
-        Color.magenta,
-        Color.cyan,
-        Color.gray,
-        Color.white,
-        Color.black
-    };
+    [Header("Card Front Sprites")]
+    public List<Sprite> cardFrontSprites = new List<Sprite>();
 
     void Start()
     {
@@ -70,7 +59,7 @@ public class CardSpawner : MonoBehaviour
             cardIDs.Add(i);
         }
 
-        if (totalCards % 2 != 0)
+        if (totalCards % 2 != 0 && pairCount > 0)
         {
             cardIDs.Add(Random.Range(0, pairCount));
         }
@@ -79,21 +68,23 @@ public class CardSpawner : MonoBehaviour
 
         foreach (int id in cardIDs)
         {
-            if (id >= cardColors.Count)
+            if (id >= cardFrontSprites.Count)
             {
-                Debug.LogError($"Not enough unique colors in cardColors list for card ID {id}.");
+                Debug.LogError($"Not enough unique sprites in cardFrontSprites list for card ID {id}.");
                 continue;
             }
 
             GameObject cardObj = Instantiate(cardPrefab, cardContainer);
             Card card = cardObj.GetComponent<Card>();
-            card.SetCard(cardColors[id], id);
+            card.SetCard(cardFrontSprites[id], id);
 
             Button button = cardObj.GetComponent<Button>();
             if (button == null)
                 button = cardObj.AddComponent<Button>();
 
-            button.onClick.AddListener(() => card.OnClick());
+            // Capture local reference for correct closure in listener
+            Card localCard = card;
+            button.onClick.AddListener(() => localCard.OnClick());
         }
     }
 
