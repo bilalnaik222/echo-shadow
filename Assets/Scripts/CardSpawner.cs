@@ -30,6 +30,7 @@ public class CardSpawner : MonoBehaviour
 
     void Start()
     {
+        ClearOldCards();
         SetupGridLayout();
         GenerateCards();
     }
@@ -43,7 +44,6 @@ public class CardSpawner : MonoBehaviour
             return;
         }
 
-        // ✅ Fixed size: 130 x 130
         grid.cellSize = new Vector2(130f, 130f);
         grid.spacing = spacing;
         grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
@@ -64,14 +64,12 @@ public class CardSpawner : MonoBehaviour
         int pairCount = totalCards / 2;
         List<int> cardIDs = new List<int>();
 
-        // Generate pairs
         for (int i = 0; i < pairCount; i++)
         {
             cardIDs.Add(i);
             cardIDs.Add(i);
         }
 
-        // Add unmatched card if odd number of cards
         if (totalCards % 2 != 0)
         {
             cardIDs.Add(Random.Range(0, pairCount));
@@ -96,6 +94,14 @@ public class CardSpawner : MonoBehaviour
                 button = cardObj.AddComponent<Button>();
 
             button.onClick.AddListener(() => card.OnClick());
+        }
+    }
+
+    void ClearOldCards()
+    {
+        foreach (Transform child in cardContainer)
+        {
+            Destroy(child.gameObject);
         }
     }
 
