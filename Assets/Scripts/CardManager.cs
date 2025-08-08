@@ -25,7 +25,33 @@ public class CardManager : MonoBehaviour
 
     private void Start()
     {
-        ResetGame(); // Ensure clean state
+        StartCoroutine(PreviewAllCards());
+    }
+
+    private IEnumerator PreviewAllCards()
+    {
+        IsBusy = true;
+
+        Card[] allCards = FindObjectsOfType<Card>();
+
+        // Show all cards (flip front)
+        foreach (Card card in allCards)
+        {
+            card.PreviewFlipFront();
+        }
+
+        yield return new WaitForSeconds(1.5f); // Show for a moment
+
+        // Flip back to start the game
+        foreach (Card card in allCards)
+        {
+            card.PreviewFlipBack();
+        }
+
+        yield return new WaitForSeconds(1f); // Wait for flip-back to complete
+
+        ResetGame();
+        IsBusy = false;
     }
 
     public void ResetGame()
@@ -34,7 +60,6 @@ public class CardManager : MonoBehaviour
         secondCard = null;
         IsBusy = false;
 
-        // Reset score when game starts
         ScoreManager.Instance?.ResetScore();
     }
 
@@ -57,7 +82,7 @@ public class CardManager : MonoBehaviour
     private IEnumerator CheckMatch()
     {
         IsBusy = true;
-        yield return new WaitForSeconds(0.6f); // Let player see cards
+        yield return new WaitForSeconds(0.6f); // Allow player to view both cards
 
         if (firstCard.ID == secondCard.ID)
         {
@@ -65,7 +90,7 @@ public class CardManager : MonoBehaviour
             secondCard.SetMatched();
 
             AudioManager.Instance?.PlayMatch();
-            ScoreManager.Instance?.AddCorrectMatch(); // ✅ +100 + combo bonus
+            ScoreManager.Instance?.AddCorrectMatch();
         }
         else
         {
@@ -73,7 +98,7 @@ public class CardManager : MonoBehaviour
             secondCard.FlipBack();
 
             AudioManager.Instance?.PlayMismatch();
-            ScoreManager.Instance?.AddIncorrectMatch(); // ✅ -10, reset combo
+            ScoreManager.Instance?.AddIncorrectMatch();
         }
 
         firstCard = null;
@@ -83,7 +108,7 @@ public class CardManager : MonoBehaviour
         if (CheckGameOver())
         {
             AudioManager.Instance?.PlayGameOver();
-            ScoreManager.Instance?.AddGameCompletionBonus(); // ✅ +500
+            ScoreManager.Instance?.AddGameCompletionBonus();
 
             yield return new WaitForSeconds(2f);
             SceneManager.LoadScene("MainMenu");

@@ -12,18 +12,7 @@ public class Card : MonoBehaviour
     private bool isMatched = false;
     private bool isAnimating = false;
 
-    // Assign card color & ID, reset states
-    // public void SetCard(Color frontColor, int id)
-    // {
-    //     cardID = id;
-    //     frontImage.color = frontColor;
-    //     frontImage.gameObject.SetActive(false);
-    //     backImage.gameObject.SetActive(true);
-    //     isFlipped = false;
-    //     isMatched = false;
-    // }
-
-// assign card sprite & ID, reset states
+    // Assign card sprite & ID, reset states
     public void SetCard(Sprite frontSprite, int id)
     {
         cardID = id;
@@ -32,8 +21,8 @@ public class Card : MonoBehaviour
         backImage.gameObject.SetActive(true);
         isFlipped = false;
         isMatched = false;
+        transform.localRotation = Quaternion.identity;
     }
-
 
     // Called by Button onClick
     public void OnClick()
@@ -41,17 +30,16 @@ public class Card : MonoBehaviour
         if (isFlipped || isMatched || CardManager.Instance.IsBusy || isAnimating)
             return;
 
-        StartCoroutine(FlipAnimation());
+        StartCoroutine(FlipAnimation(true));
         CardManager.Instance.OnCardFlipped(this);
-        AudioManager.Instance.PlayFlip();
+        AudioManager.Instance?.PlayFlip();
     }
 
-    // Coroutine for flip animation (Y axis rotation)
-    private IEnumerator FlipAnimation()
+    // Flip animation used for both gameplay & preview
+    private IEnumerator FlipAnimation(bool flipToFront)
     {
         isAnimating = true;
 
-        // Rotate Y from 0 to 90 degrees
         float time = 0f;
         while (time < 0.25f)
         {
@@ -61,12 +49,19 @@ public class Card : MonoBehaviour
             yield return null;
         }
 
-        // Toggle front/back visibility mid-flip
-        isFlipped = !isFlipped;
-        frontImage.gameObject.SetActive(isFlipped);
-        backImage.gameObject.SetActive(!isFlipped);
+        if (flipToFront)
+        {
+            isFlipped = true;
+            frontImage.gameObject.SetActive(true);
+            backImage.gameObject.SetActive(false);
+        }
+        else
+        {
+            isFlipped = false;
+            frontImage.gameObject.SetActive(false);
+            backImage.gameObject.SetActive(true);
+        }
 
-        // Rotate Y from 90 to 0 degrees
         time = 0f;
         while (time < 0.25f)
         {
@@ -80,55 +75,31 @@ public class Card : MonoBehaviour
         isAnimating = false;
     }
 
-    // Called by CardManager if mismatch to flip back
     public void FlipBack()
     {
         if (isAnimating) return;
-
-        StartCoroutine(FlipBackAnimation());
+        StartCoroutine(FlipAnimation(false));
     }
 
-    private IEnumerator FlipBackAnimation()
+    // ✅ PREVIEW: Flip card to front with animation & sound
+    public void PreviewFlipFront()
     {
-        isAnimating = true;
-
-        // Rotate Y from 0 to 90 degrees
-        float time = 0f;
-        while (time < 0.25f)
-        {
-            float angle = Mathf.Lerp(0, 90, time / 0.25f);
-            transform.localRotation = Quaternion.Euler(0, angle, 0);
-            time += Time.deltaTime;
-            yield return null;
-        }
-
-        // Set back side visible, front hidden
-        isFlipped = false;
-        frontImage.gameObject.SetActive(false);
-        backImage.gameObject.SetActive(true);
-
-        // Rotate Y from 90 to 0 degrees
-        time = 0f;
-        while (time < 0.25f)
-        {
-            float angle = Mathf.Lerp(90, 0, time / 0.25f);
-            transform.localRotation = Quaternion.Euler(0, angle, 0);
-            time += Time.deltaTime;
-            yield return null;
-        }
-
-        transform.localRotation = Quaternion.identity;
-        isAnimating = false;
+        StartCoroutine(FlipAnimation(true));
+        AudioManager.Instance?.PlayFlip();
     }
 
-    // Mark card as matched, disable interaction optionally
+    // ✅ PREVIEW: Flip card to back with animation & sound
+    public void PreviewFlipBack()
+    {
+        StartCoroutine(FlipAnimation(false));
+        AudioManager.Instance?.PlayFlip();
+    }
+
     public void SetMatched()
     {
         isMatched = true;
-        // Optional: disable Button or add visual effect
     }
 
-    // Public getters
     public int ID => cardID;
     public bool IsMatched => isMatched;
 }
